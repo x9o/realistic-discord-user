@@ -4,6 +4,7 @@
     "cai-token": "",
     "elevenlabs-voice-id": "",
     "elevenlabs-api-key": "",
-    "whitelisted-users": []
+    "whitelisted-users": [],
+    "voice-id": ""
 
 }

@@ -9,6 +9,7 @@ A discord user, but active 24/7
 - **Real time voice-chat**
   ![image](https://github.com/user-attachments/assets/311058c2-2a51-4386-a34c-00ae9be4e81d)
   _A 👂 reaction means it is connected to voice chat and will speak_
+  
 
 - **Fun commands**
   ![image](https://github.com/user-attachments/assets/7e63d44c-bf24-4f8f-93e6-d823c324df41)

@@ -1,6 +1,6 @@
-# Discord bot developed for the server "trap house"
+# Realistic discord user
 
-https://discord.gg/xprJQ2xr
+A discord user, but active 24/7
 
 # Features
 - **Realistic messaging and image recognition (Does not use ChatGPT)**

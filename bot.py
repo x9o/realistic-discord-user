@@ -408,16 +408,10 @@ async def on_message(message):
                                                             
                                 break
 
-                    if image_url:                 
-                        async with await client.connect() as chat:
-                            message2 = await chat.send_message(
-                                char=char, chat_id=chats[str(message.author.id)], text=ms, image=image_url
-                            )
-                    else:
-                        async with await client.connect() as chat:
-                            message2 = await chat.send_message(
-                                char=char, chat_id=chats[str(message.author.id)], text=ms
-                            )
+                    async with await client.connect() as chat:
+                        message2 = await chat.send_message(
+                            char=char, chat_id=chats[str(message.author.id)], text=ms, image=image_url
+                        )
 
                 await message.reply(message2.text)
 

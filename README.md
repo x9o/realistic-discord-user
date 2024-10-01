@@ -34,4 +34,4 @@ A discord user, but active 24/7
   ![image](https://github.com/user-attachments/assets/104e53b2-1a85-4d1b-9e00-5655dbf59bda)
   _A list of whitelisted accounts that is able to use commands_
 
--** And many more**
+- ** And many more**

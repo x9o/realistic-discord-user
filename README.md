@@ -13,14 +13,20 @@ A discord user, but active 24/7
 - **Fun commands**
   ![image](https://github.com/user-attachments/assets/7e63d44c-bf24-4f8f-93e6-d823c324df41)
   ![image](https://github.com/user-attachments/assets/00cbeb39-b26e-43b0-98c9-d4a8efe894d4)
+  
   _If the user tries to change their display name, it will instantly be changed to the provided name_
 
 - **Utility commands**
  ![image](https://github.com/user-attachments/assets/bfebdd70-0fa2-493e-9f7c-0de5237d4b3c)
+
  _Blocks the user from interacting with the bot_
+
  ![image](https://github.com/user-attachments/assets/1b7f4a82-ef0d-4cf1-91e0-1ae1737c93eb)
+ 
   _The user is blocked from voice chats_
+  
 ![image](https://github.com/user-attachments/assets/215a6b76-ce17-4e86-9b5f-f9f87609879f)
+
  _Locks the bot from all non-whitelisted users_
 
 - **Whitelist system**

@@ -5,6 +5,10 @@
     "elevenlabs-voice-id": "",
     "elevenlabs-api-key": "",
     "whitelisted-users": [],
-    "voice-id": ""
+    "voice-id": "",
+    "t2": "",
+    "ct2": "",
+    "cvid2": "",
+    "prefix": ""
 
 }

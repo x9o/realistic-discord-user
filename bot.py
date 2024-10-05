@@ -4,17 +4,42 @@ from discord.ext import commands
 
 
 
-bot = commands.Bot(command_prefix = 'th.', intents=discord.Intents.all())
+# early unorganised version
+#v0.02
+###
+# todolist
+#organise commands into utility and base with commands.cog
+#add dm support
+#add reactions, detects message sentiment using flair, low chance to react 
+#disconnect vc logic for multiple users
+#add speech to text (for users) for fluent voice chat
+#random vc join and leave delay for naturalness
+###
 
+mode = "2"
+configc = {
+    "1": {
+        "voice-id": "voice-id",
+        "cai-char-id": "cai-char-id",
+    },
+    "2": {
+        "voice-id": "cvid2",
+        "cai-char-id": "ct2",
+    }
+}
 
 config = json.load(open('config.json'))
 chats = json.load(open('chats.json'))
-char = config['cai-char-id']
+char = config[configc[mode]['cai-char-id']]
 token = config['cai-token']
-voiceid = config['voice-id']
+voiceid = config[configc[mode]['voice-id']]
 client = aiocai.Client(config['cai-token'])
+prefix = config['prefix']
 
 
+
+
+bot = commands.Bot(command_prefix = prefix, intents=discord.Intents.all())
 
 slock = False
 niggasaidx = []
@@ -25,8 +50,21 @@ banished = []
 
 @bot.event
 async def on_ready():
+    
     print(f'Logged in as {bot.user.name}')
+    
+    
 
+bot.remove_command("help")
+
+@bot.command()
+async def help(ctx):
+    embed = discord.Embed(title="Help", description="", color=0x00ff00)
+    embed.add_field(name="@ or reply to a message", value="", inline=False)
+    embed.add_field(name="join vc for voice chat", value="", inline=False)
+
+
+    await ctx.reply(embed=embed)
 
 
 
@@ -369,119 +407,132 @@ async def on_message(message):
 
    
        
-    try: 
-        if (not slock or message.author.id in config['whitelisted-users']) and not message.author.voice and not message.author in banished and not message.author in niggasaidx and not message.author in quotex and not message.author == bot: 
-            
-            
-            if message.reference:
-                xmessage = await message.channel.fetch_message(message.reference.message_id)
-                if xmessage.author.id == bot.user.id:
-                    start = True
-                refmsgc = xmessage.content
-            if bot.user.mention in message.content:
+    
+    if not message.author.voice and (not slock or message.author.id in config['whitelisted-users']) and not message.author in banished and not message.author in niggasaidx and not message.author in quotex and not message.author == bot: 
+        
+        
+        if message.reference:
+            xmessage = await message.channel.fetch_message(message.reference.message_id)
+            if xmessage.author.id == bot.user.id:
                 start = True
+            refmsgc = xmessage.content
+        if bot.user.mention in message.content:
+            start = True
 
 
-            if start:
-                me = await client.get_me()
-                ctx = await bot.get_context(message)
-                if str(message.author.id) not in chats.keys():
-                        async with await client.connect() as chat:
-                            response, answer = await chat.new_chat(char, me.id)
-                        chats[str(message.author.id)] = response.chat_id
-                        json.dump(chats, open('chats.json', 'w'))       
-
-                async with ctx.typing(): 
-                    ms = message.content
-                    if "<@993061478414438400>" in ms:
-                        ms = ms.replace("<@993061478414438400>", "trap house lover")
-                    if refmsgc: 
-                        ms = f'"{refmsgc}"' + " " + ms
+        if start:
+            me = await client.get_me()
+            ctx = await bot.get_context(message)
+            
+            if str(message.author.id) not in chats[char].keys():
                     
-                    
-                    
-                    image_url = None
-                    if len(message.attachments) > 0:
-                        for attachment in message.attachments:
-                            if attachment.content_type and attachment.content_type.startswith('image/'):
-                                image_url = attachment.url
-                                                            
-                                break
-
                     async with await client.connect() as chat:
-                        message2 = await chat.send_message(
-                            char=char, chat_id=chats[str(message.author.id)], text=ms, image=image_url
-                        )
+                        response, answer = await chat.new_chat(char, me.id)
+                        
+                    chats[char][str(message.author.id)] = response.chat_id
+                    json.dump(chats, open('chats.json', 'w'))       
 
-                await message.reply(message2.text)
+            async with ctx.typing(): 
+                ms = message.content
+                if f"{bot.user.id}" in ms:
+                    ms = ms.replace(f"<@{bot.user.id}>", "")
+                if refmsgc: 
+                    ms = f'"{refmsgc}"' + " " + ms
+                
+                
+                
+                image_url = None
+                if len(message.attachments) > 0:
+                    for attachment in message.attachments:
+                        if attachment.content_type and attachment.content_type.startswith('image/'):
+                            image_url = attachment.url
+                                                        
+                            break
+
+                                
+                async with await client.connect() as chat:
+                    message2 = await chat.send_message(
+                        char=char, chat_id=chats[char][str(message.author.id)], text=ms, image=image_url
+                    )
+                
+            await message.reply(message2.text)
+
+
+    
+    if niggasaidx:
+        if message.author in niggasaidx:
+            msga = message.content + " "
+            if message.attachments:
+                
+                for attachment in message.attachments:
+                    msga += attachment.filename + " "
+                
+            await message.reply(f"nigga said {msga}")
+
+    if quotex:
+        if message.author in quotex:
+            msga = message.content + " "
+            if message.attachments:
+                
+                for attachment in message.attachments:
+                    msga += attachment.filename + " "
+                
+            await message.reply(f'"{msga}" {emojix}')
+
+    if softbanx:
+        if message.author.id in softbanx:
+            await message.delete()
+
+    if reactx:
+        await message.add_reaction(reactx[message.author.id])
+
+
+    if message.author.voice and message.author.voice.channel and not message.author in banished and not message.author in niggasaidx and not vcdisabled and not message.author == bot:
+        ctx = await bot.get_context(message)    
+
+        if message.reference:
+            xmessage = await message.channel.fetch_message(message.reference.message_id)
+            if xmessage.author.id == bot.user.id:
+                start = True
+            refmsgc = xmessage.content
+        if bot.user.mention in message.content:
+            start = True
+        
+        if start:
+            voice_state = message.author.voice
+            voice_channel = voice_state.channel
+            if not ctx.voice_client:
+                await voice_channel.connect()
+
+                @bot.event
+                async def on_voice_state_update(member, before, after):
+                    if member == message.author:
+                        if before.channel is not None and after.channel is None:
+                            voice = ctx.voice_client
+                            await voice.disconnect()
 
 
         
-        if niggasaidx:
-            if message.author in niggasaidx:
-                msga = message.content + " "
-                if message.attachments:
-                    
-                    for attachment in message.attachments:
-                        msga += attachment.filename + " "
-                    
-                await message.reply(f"nigga said {msga}")
-
-        if quotex:
-            if message.author in quotex:
-                msga = message.content + " "
-                if message.attachments:
-                    
-                    for attachment in message.attachments:
-                        msga += attachment.filename + " "
-                    
-                await message.reply(f'"{msga}" {emojix}')
-
-        if softbanx:
-            if message.author.id in softbanx:
-                await message.delete()
-
-        if reactx:
-            await message.add_reaction(reactx[message.author.id])
-
-
-        if message.author.voice and message.author.voice.channel and not message.author in banished and not message.author in niggasaidx and not vcdisabled:
-            ctx = await bot.get_context(message)    
-
-            if message.reference:
-                xmessage = await message.channel.fetch_message(message.reference.message_id)
-                if xmessage.author.id == bot.user.id:
-                    start = True
-                refmsgc = xmessage.content
-            if bot.user.mention in message.content:
-                start = True
+        
             
-            if start:
-                voice_state = message.author.voice
-                voice_channel = voice_state.channel
-                if not ctx.voice_client:
-                    await voice_channel.connect()
 
-            
-            
-                
-
-                async with ctx.typing(): 
+            async with ctx.typing(): 
+                async with await client.connect(token) as chat:
                     await message.add_reaction('👂')
-                    me = await client.get_me()
-                    if str(message.author.id) not in chats.keys():
-                            print("not in chat key")
+                    
+                    if str(message.author.id) not in chats[char].keys():
+                            me = await client.get_me()
                             async with await client.connect() as chat:
                                 response, answer = await chat.new_chat(char, me.id)
-                            chats[str(message.author.id)] = response.chat_id
+                            chats[char][str(message.author.id)] = response.chat_id
                             json.dump(chats, open('chats.json', 'w'))
 
                     
 
                     mc = message.content
 
-                    if "<@993061478414438400>" in mc:
-                            mc = mc.replace("<@993061478414438400>", "trap house lover")
+                    if f"{bot.user.id}" in mc:
+                            mc = mc.replace(f"<@{bot.user.id}>", "")
                     if refmsgc: 
                             mc = f'"{refmsgc}"' + " " + mc
 
@@ -489,29 +540,41 @@ async def on_message(message):
                     
                     image_url = None
                     if len(message.attachments) > 0:
-                        print("has image")
+                        
                         for attachment in message.attachments:
                             if attachment.content_type and attachment.content_type.startswith('image/'):
                                 image_url = attachment.url
                                                             
                                 break
                             
-                    async with await client.connect(token) as chat:
-                        datax = await chat.send_message(
-                                    char=char, chat_id=chats[str(message.author.id)], text=mc, image=image_url
-                                )
-                        text = datax.text
-                        datax = datax.model_dump()
-                        audio = requests.post("https://neo.character.ai/multimodal/api/v1/memo/replay", headers={"Authorization": f"Token {token}"}, json={"roomId":datax['turn_key']['chat_id'], "turnId":datax['turn_key']['turn_id'], "candidateId":datax['candidates'][0]['candidate_id'], "voiceId":voiceid})
+                    
+                    datax = await chat.send_message(
+                                char=char, chat_id=chats[char][str(message.author.id)], text=mc, image=image_url
+                            )
+                    text = datax.text
+                    datax = datax.model_dump()
+                    audio = requests.post("https://neo.character.ai/multimodal/api/v1/memo/replay", headers={"Authorization": f"Token {token}"}, json={"roomId":datax['turn_key']['chat_id'], "turnId":datax['turn_key']['turn_id'], "candidateId":datax['candidates'][0]['candidate_id'], "voiceId":voiceid})
                         
                 ctx.voice_client.play(discord.FFmpegPCMAudio(audio.json()["replayUrl"]))
-                        
-                await message.reply(text)
-    except Exception as e:
-        print(e)
+                    
+            await message.reply(text)
+    
 
 
                 
 
 
-bot.run(config['discord-token'])
+        
+
+
+
+
+            
+            
+
+
+
+
+
+
+bot.run(config["t2"])

@@ -2,7 +2,7 @@
 
 A discord user, but active 24/7
 
-Release when the todolist is finished!
+Outdated
 
 # Features
 - **Realistic messaging and image recognition (Does not use ChatGPT)**
